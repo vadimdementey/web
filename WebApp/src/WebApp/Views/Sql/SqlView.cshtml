@@ -1,0 +1,14 @@
+﻿@model SqlLibrary.SqlCommandModel
+
+<form method="post" action="/sql/execute">
+    <textarea name="command" cols="100" rows="10">@Model.Command</textarea>
+    <br/>
+    <br/>
+    <button formaction="/sql/execute" >EXECUTE SQL</button>
+</form>
+
+@foreach (var sqlCommand in Model.ResultSet)
+{
+    <br />
+    <span>@sqlCommand</span>
+}

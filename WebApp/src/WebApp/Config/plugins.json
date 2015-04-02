@@ -1,0 +1,5 @@
+{
+	"System.QueryBuilder.MsSql": {"Type": "Assembly","Connection": "Data Source=.;Initial Catalog=atoll-shop;User ID=sa;Password=1","RemoteConnection":"Data Source=w05.hosterby.com;Initial Catalog=aquateka_db;User ID=aquateka_sa;Password=Eixe7ohk", "Log": "\\Log", "DateTime": "DMY" },
+	"eCommerce.Production"     : {"Type": "Assembly" },
+	"eCommerce.Sales"          : {"Type": "Assembly" }
+}
