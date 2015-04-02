@@ -24,7 +24,7 @@ namespace SqlLibrary
 
         private SqlCommand createCommand(string connectionStringKey,string sqlCommand)
         {
-            IConfigProvider provider = Context.ApplicationServices.GetRequiredService<IConfigProvider>();
+            IConfigProvider  provider = Context.ApplicationServices.GetRequiredService<IConfigProvider>();
 
             return new SqlCommand(sqlCommand, new SqlConnection(provider.GetString(connectionStringKey)));
         }
@@ -38,6 +38,37 @@ namespace SqlLibrary
 
             return null;
         }
+
+
+        private async Task<SqlCommandModel> appendSqlValues(StringBuilder insertPattern, SqlCommandModel model, SqlDataReader dataReader)
+        {
+            StringBuilder sqlBuffer = new StringBuilder();
+
+            while (await dataReader.ReadAsync())
+            {
+                sqlBuffer.Length = 0;
+                sqlBuffer.Append(insertPattern);
+
+                for (int i = 0; i < dataReader.FieldCount; i++)
+                {
+                    if (i > 0)
+                    {
+                        sqlBuffer.Append(',');
+                    }
+
+                    sqlBuffer.AppendConstant(dataReader.GetFieldType(i), dataReader.GetValue(i));
+                }
+
+                sqlBuffer.Append(')');
+
+                model.ResultSet.Add(sqlBuffer.ToString());
+
+            }
+
+            return model;
+
+        }
+
 
 
 
@@ -91,34 +122,7 @@ namespace SqlLibrary
 
             return View("SqlView", model);
 
-            insertPattern.Append(")values(");
-
-            StringBuilder sqlBuffer = new StringBuilder();
-
-            while (await dataReader.ReadAsync())
-            {
-                sqlBuffer.Length = 0;
-                sqlBuffer.Append(insertPattern);
-
-                for (int i = 0; i < dataReader.FieldCount; i++)
-                {
-                    if (i > 0)
-                    {
-                        sqlBuffer.Append(',');
-                    }
-
-                    sqlBuffer.AppendConstant(dataReader.GetFieldType(i), dataReader.GetValue(i));
-                }
-
-                sqlBuffer.Append(')');
-
-                model.ResultSet.Add(sqlBuffer.ToString());
-
-            }
-
-
-               
-            return View("SqlView", model);
+            return View("SqlView", await appendSqlValues(insertPattern.Append(")values("), model, dataReader));
         }
     }
 }
